@@ -4,16 +4,17 @@ import Auth from './components/Auth'
 import Account from './components/Account'
 import Dashboard from './components/Dashboard'
 import Deposit from './components/Deposit'
+import SendMoney from './components/SendMoney'
 import Menu from './components/Menu'
 import AdminDashboard from './components/AdminDashboard'
 import { View } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 
-type Screen = 'dashboard' | 'deposit' | 'profile' | 'admin'
+type AppScreen = 'dashboard' | 'deposit' | 'profile' | 'admin' | 'sendMoney'
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
-  const [screen, setScreen] = useState<Screen>('dashboard')
+  const [screen, setScreen] = useState<AppScreen>('dashboard')
   const [balance, setBalance] = useState(0)
   const [username, setUsername] = useState('')
   const [website, setWebsite] = useState('')
@@ -32,6 +33,7 @@ export default function App() {
   }, [])
 
   const fetchProfile = useCallback(async () => {
+    console.log('Fetching profile from server...');
     setIsRefreshing(true);
     try {
       if (session?.user) {
@@ -40,6 +42,8 @@ export default function App() {
           .select(`username, website, avatar_url, balance, is_admin`)
           .eq('id', session.user.id)
           .single()
+
+        console.log('Profile data received:', data);
 
         if (data) {
           setUsername(data.username)
@@ -70,7 +74,6 @@ export default function App() {
 
   const handleDeposit = (amount: number) => {
     if (amount > 0) {
-      setBalance((prev) => prev + amount)
       setScreen('dashboard')
     }
   }
@@ -83,10 +86,14 @@ export default function App() {
             balance={balance} 
             isRefreshing={isRefreshing}
             onDepositPress={() => setScreen('deposit')} 
+            onSendMoneyPress={() => setScreen('sendMoney')}
+            email={session.user?.email}
           />
         )
       case 'deposit':
         return <Deposit onDeposit={handleDeposit} onDepositSuccess={fetchProfile} />
+      case 'sendMoney':
+        return <SendMoney onSend={() => setScreen('dashboard')} onSendSuccess={fetchProfile} />
       case 'profile':
         return <Account key={session.user.id} session={session} />
       case 'admin':
@@ -97,6 +104,7 @@ export default function App() {
             balance={balance}
             isRefreshing={isRefreshing}
             onDepositPress={() => setScreen('deposit')}
+            onSendMoneyPress={() => setScreen('sendMoney')} 
           />
         );
     }

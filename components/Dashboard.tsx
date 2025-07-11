@@ -5,12 +5,17 @@ type Props = {
   balance: number
   isRefreshing: boolean
   onDepositPress: () => void
+  onSendMoneyPress: () => void
+  email?: string
 }
 
-export default function Dashboard({ balance, isRefreshing, onDepositPress }: Props) {
+export default function Dashboard({ balance, isRefreshing, onDepositPress, onSendMoneyPress, email }: Props) {
 
   return (
     <View style={[styles.container, { justifyContent: 'center' }]}>
+      {email && (
+        <Text style={styles.emailText}>{email}</Text>
+      )}
       <Text style={styles.title}>Dashboard</Text>
       <View style={styles.balanceContainer}>
         <Text style={styles.balanceLabel}>Current Balance</Text>
@@ -27,6 +32,12 @@ export default function Dashboard({ balance, isRefreshing, onDepositPress }: Pro
         >
           <Text style={styles.depositButtonText}>Deposit Funds</Text>
         </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.sendMoneyButton}
+          onPress={onSendMoneyPress}
+        >
+          <Text style={styles.sendMoneyButtonText}>Send Money</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.withdrawButton} disabled>
           <Text style={styles.withdrawButtonText}>Withdraw Funds (Coming Soon)</Text>
         </TouchableOpacity>
@@ -37,9 +48,14 @@ export default function Dashboard({ balance, isRefreshing, onDepositPress }: Pro
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 0,
+    marginTop: 40,
     padding: 12,
     alignItems: 'center',
+  },
+  emailText: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 8,
   },
   title: {
     fontSize: 24,
@@ -68,6 +84,16 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   depositButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  sendMoneyButton: {
+    backgroundColor: '#28a745',
+    padding: 12,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  sendMoneyButtonText: {
     color: '#fff',
     fontSize: 16,
   },
